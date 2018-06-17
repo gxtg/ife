@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>loading</title>
+	<style>
+		body,
+		html {
+			padding: 0;
+			margin: 0;
+		}
+
+		div {
+			box-sizing: border-box;
+		}
+
+		.wrap {
+			position: absolute;
+			width: 40px;
+			height: 40px;
+			top: 40%;
+			left: 50%;
+			margin-left: -20px;
+		}
+
+		.wrap::before {
+			content: "";
+			position: absolute;
+			left: 0;
+			width: 38px;
+			height: 38px;
+			border: 1px solid #e2cfcf;
+			border-radius: 50%;
+			border-top: 1px solid transparent;
+			animation: wr-around 1s linear infinite;
+		}
+
+		@keyframes wr-around {
+			to {
+				transform: rotateZ(-360deg);
+			}
+		}
+
+		.main {
+			position: relative;
+			width: 24px;
+			height: 24px;
+			margin: 8px;
+		}
+
+		.left-around {
+			position: absolute;
+			width: 12.35px;
+			height: 24px;
+			border-top-left-radius: 12px;
+			border-bottom-left-radius: 12px;
+			background-color: #d4a29f;
+		}
+
+		.left-around::before {
+			content: "";
+			position: absolute;
+			width: 12px;
+			height: 24px;
+			border-top-left-radius: 12px;
+			border-bottom-left-radius: 12px;
+			background-color: #13cebc;
+			transform-origin: 100% 50%;
+			animation: le-around 1s linear infinite;
+		}
+
+		@keyframes le-around {
+			0% {
+				transform: rotate(0deg);
+			}
+			25% {
+				transform: rotate(-180deg);
+			}
+			50% {
+				transform: rotate(-180deg);
+			}
+			75% {
+				transform: rotate(-360deg);
+			}
+			100% {
+				transform: rotate(-360deg);
+			}
+		}
+
+		.right-around {
+			position: absolute;
+			left: 12px;
+			width: 12px;
+			height: 24px;
+			overflow: hidden;
+			border-top-right-radius: 12px;
+			border-bottom-right-radius: 12px;
+			background-color: #d4a29f;
+		}
+
+		.right-around::before {
+			content: "";
+			position: absolute;
+			width: 12px;
+			height: 24px;
+			border-top-right-radius: 12px;
+			border-bottom-right-radius: 12px;
+			background-color: #13cebc;
+			transform-origin: 0% 50%;
+			animation: ri-around 1s linear infinite;
+		}
+
+		@keyframes ri-around {
+			0% {
+				transform: rotate(0deg);
+			}
+			25% {
+				transform: rotate(0deg);
+			}
+			50% {
+				transform: rotate(-180deg);
+			}
+			75% {
+				transform: rotate(-180deg);
+			}
+			100% {
+				transform: rotate(-360deg);
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<div class="wrap">
+		<div class="main">
+			<div class="left-around"></div>
+			<div class="right-around"></div>
+		</div>
+	</div>
+</body>
+
+</html>
