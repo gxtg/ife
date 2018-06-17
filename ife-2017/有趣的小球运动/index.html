@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>小球运动</title>
+
+<style type="text/css">
+    /*将文本渲染成小球*/
+  p {
+		border-radius: 50%;
+		width: 30px;
+		height: 30px;
+		position: absolute;
+		text-align: center;
+		line-height: 30px;
+		color: white;
+   }
+</style>
+</head>
+
+<body>
+</body>
+
+<script type="text/javascript">
+    //创建数组存储所有的小球
+    var  balls = [];
+    
+    //创建小球函数
+    function createballs() {
+      for (var i = 0;i < 60;i++) {
+	    	var  ball = document.createElement("p");
+	    	ball.innerHTML = i + 1;
+	    	ball.style.backgroundColor = randomColor();
+	    
+      	//将创建的小球存储到数组中
+	    	document.body.appendChild( ball);
+	    
+      	//将所有的小球存在数组中
+	    	balls.push( ball);
+			}
+   	}
+    
+    createballs();
+    //随机函数
+    function randomNum(m, n) {
+			return Math.floor(Math.random() * (n - m + 1) + m);
+    }
+    
+    //随机颜色
+    function randomColor() {
+			return "rgb(" + randomNum(0, 255) + "," + randomNum(0, 255) + "," + randomNum(0, 255) + ")";
+    }
+    
+    document.onmousemove = function(e) {
+			var eventObj = e || event;
+			for(var i =  balls.length - 1;i > 0; i--) {
+	    //将小球的下标通过for循环进行传递
+	    	balls[i].style.left =  balls[i - 1].style.left;
+	    	balls[i].style.top=  balls[i - 1].style.top;
+			}
+	
+      //将第一个小球赋值为最新的事件对象中的坐标
+			balls[0].style.left = eventObj.clientX + "px";
+			balls[0].style.top= eventObj.clientY + "px";
+    }
+</script>
+
+</html>

@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+	<title>贪吃蛇</title>
+	<style>
+
+		html, body {
+			padding: 0;
+			margin: 0;
+			font-size: 14px;
+		}
+		
+		.wrap {
+			margin-top: 50px;
+		}
+
+		.tool {
+			width: 500px;
+			margin: 0 auto;
+			padding: 10px 0;
+		}
+		.tool::after {
+			display: block;
+			content: '';
+			clear: both;
+		}
+		.tool button {
+			display: inline-block;
+			float: left;
+			width: 15%;
+			margin-right: 10%;
+    	margin-bottom: 0;
+    	text-align: center;
+    	vertical-align: middle;
+    	cursor: pointer;
+    	white-space: nowrap;
+    	line-height: 20px;
+    	padding: 8px 13px;
+    	border-radius: 4px;
+    	-webkit-user-select: none;
+    	-moz-user-select: none;
+    	-ms-user-select: none;
+    	user-select: none;
+    	color: #667d99;
+    	background: #e7edf3;
+    	border: 0;
+		}
+		.tool button:hover {
+			background-color: #d7dfea;
+		}
+
+		.tool > div > span{
+			float: left;
+			display: inline-block;
+			text-align: center;
+    	vertical-align: middle;
+    	line-height: 20px;
+    	padding: 8px 13px;
+    	border-radius: 4px;
+    	color: #667d99;
+    	background: #e7edf3;
+    	border: 0;
+		}
+		
+		p {
+			text-align: center;
+			color: #667d99;
+		}
+		.score {
+			margin-left: 10px;
+		}
+
+		.main {
+			margin: 80px auto;
+			border: 1px solid #e7edf3;
+		}
+
+		.col {
+    	height: 20px;
+    	width: 20px;
+    	box-sizing: border-box;
+    	float: left;
+		}
+
+		.activeSnake {
+			border-radius: 50%;
+		  background: #667d99;
+		}
+
+		.food {
+    	background: #17e6d3;
+    	border-radius: 50%;
+		}
+	</style>
+</head>
+<body>
+	<div class="wrap">
+		<p>贪吃蛇小游戏</p>
+		<div class="tool">
+			<button class="start" id="start">start</button>
+			<button class="pause" id="pause">pause</button>
+			<button class="restart" id="restart">restart</button>
+			<div>
+				<span>scroe：</span>
+				<span class="score" id="score">0</span>
+			</div>
+		</div>
+		<p>注：每按前进方向加速一次，按后退方向减速一次</p> 
+		<div id="#main" class="main"></div>
+	</div>
+	<script>
+		
+		class tanchishen {
+			constructor(ele, x, y) {
+				this.ele = document.getElementById(ele); // “贪吃蛇”挂载元素
+				this.$start = document.querySelector('.start');
+				this.$pause = document.querySelector('.pause');
+				this.$restart = document.querySelector('.restart');
+				this.$score = document.querySelector('.score');
+				this.x = x; // 地图行数；
+				this.y = y; // 地图列数；
+				this.sx = 0; // 蛇头横坐标
+				this.sy = 2; // 蛇头纵坐标
+				this.flagX = 0; // 食物的横坐标
+				this.flagY = 0; // 食物的纵坐标
+				this.score = 0; // 得分计数
+				this.speed = 300; // 初始化蛇前进速度
+				this.direction = 'right'; // 记录蛇的移动方向，初始为“right”
+				this.map = this.initMap(this.ele, x, y); // 初始化地图
+				this.snake = this.initSnake(); // 初始化蛇模型
+				this.moveTimer = setInterval(this.moveSnake.bind(this), this.speed); //保存定时器id,用于暂停操作
+				this.init();
+			}
+
+			init() {
+				this.createFood(); // 食物坐标初始化
+				document.addEventListener('keydown', this.changeDir.bind(this));
+				this.$start.addEventListener('click', this.start.bind(this));
+				this.$restart.addEventListener('click', this.restart.bind(this));
+				this.$pause.addEventListener('click', this.pause.bind(this));
+				clearInterval(this.moveTimer); // 清除定时器，由start按钮开启
+			}
+			// 初始化地图
+			initMap(ele, x, y) {
+				ele.style.width = y * 20 +'px'; // 初始化宽度
+				ele.style.height = x * 20 + 'px'; // 初始化高度
+				let mapArray = []
+				for (let i = 0; i < x; i++) {
+					let rowArray = []
+					for (let j = 0; j < y; j++) {
+						let clo = document.createElement('span');
+								clo.className = 'col'; // 初始化类名
+						ele.appendChild(clo);
+						rowArray.push(clo);
+					}
+					mapArray.push(rowArray);  // 构建地图坐标的二维数组
+				}
+				return mapArray;
+			}
+
+			//  初始化蛇模型
+			initSnake() {
+				let snake = [];
+				let i;
+				// 初始化蛇身
+				for ( i = 0; i < 3; i++) {
+				  // 为蛇身设置不同颜色的div
+				  this.map[0][i].classList.add('activeSnake');
+				  // 存储在蛇身数组中
+				  snake.push(this.map[0][i]);
+				}
+				return snake;
+			}
+
+			// 改变方向
+			changeDir(event) {
+    		
+    		if (!event.keyCode) return; // 没有指令直接退出函数
+
+    		// 反方向减速，同方向加速
+    		if (this.direction == 'right' && event.keyCode == 37) {
+    			this.speed += 30;
+    			clearInterval(this.moveTimer);
+    			this.moveTimer = setInterval(this.moveSnake.bind(this), this.speed);
+    		  return;
+    		}
+    		if (this.direction == 'left' && event.keyCode == 39) {
+    			this.speed += 30;
+    			clearInterval(this.moveTimer);
+    			this.moveTimer = setInterval(this.moveSnake.bind(this), this.speed);
+    		  return;
+    		}
+    		if (this.direction == 'up' && event.keyCode == 40) {
+    			this.speed += 30;
+    			clearInterval(this.moveTimer);
+    			this.moveTimer = setInterval(this.moveSnake.bind(this), this.speed);
+    		  return;
+    		}
+    		if (this.direction == 'down' && event.keyCode == 38) {
+    			this.speed += 30;
+    			clearInterval(this.moveTimer);
+    			this.moveTimer = setInterval(this.moveSnake.bind(this), this.speed);
+    		  return;
+    		}
+    		if (this.direction == 'right' && event.keyCode == 39) {
+    			this.speed -= 30;
+    			clearInterval(this.moveTimer);
+    			this.moveTimer = setInterval(this.moveSnake.bind(this), this.speed);
+    		  return;
+    		}
+    		if (this.direction == 'left' && event.keyCode == 37) {
+    			this.speed -= 30;
+    			clearInterval(this.moveTimer);
+    			this.moveTimer = setInterval(this.moveSnake.bind(this), this.speed);
+    		  return;
+    		}
+    		if (this.direction == 'up' && event.keyCode == 38) {
+    			this.speed -= 30;
+    			clearInterval(this.moveTimer);
+    			this.moveTimer = setInterval(this.moveSnake.bind(this), this.speed);
+    		  return;
+    		}
+    		if (this.direction == 'down' && event.keyCode == 40) {
+    			this.speed -= 80;
+    			clearInterval(this.moveTimer);
+    			this.moveTimer = setInterval(this.moveSnake.bind(this), this.speed);
+    		  return;
+    		}
+
+    		// 根据keyCode确定蛇要移动的方向
+    		switch (event.keyCode) {
+    			case 37:
+    			  this.direction = 'left';// 向左
+    			  break;
+    			case 38:
+    			  this.direction = 'up';// 向上;
+    			  break;
+    			case 39:
+    			  this.direction = 'right';// 向右
+    			  break;
+    			case 40:
+    			  this.direction = 'down';// 向下
+    			  break;
+    		}
+  
+			}
+
+			// 蛇移动函数
+			moveSnake() {
+    		// 移动
+    		switch (this.direction) {
+    			case 'left':
+    			  this.sy--;
+    			  break;
+    			case 'right':
+    			  this.sy++;
+    			  break;
+    			case 'up':
+    			  this.sx--;
+    			  break;
+    			case 'down':
+    			  this.sx++;
+    			  break;
+    		}
+
+    		// 判断移动路径是否合法
+    		if (!this.check()) return;
+
+
+    		// 判断蛇头移动的位置是否有食物
+    		if (this.flagX == this.sx && this.flagY == this.sy) {
+    				// 有食物
+    		    this.map[this.flagX][this.flagY].className = 'col activeSnake';
+    		    this.snake.push(this.map[this.flagX][this.flagY]);// 加入蛇身
+    		    this.score++;// 得分增加
+    		    // 更新当前的分数
+    		    this.$score.innerHTML = this.score;
+    		    // 随机产生一个新的蛋
+    		    this.createFood();
+    		} else {
+    		   // 没有食物
+    		   this.snake[0].classList.remove('activeSnake');
+    		   this.snake.shift(); // 移除蛇尾
+    		   this.map[this.sx][this.sy].classList.add('activeSnake'); // 更新蛇头
+    		   this.snake.push(this.map[this.sx][this.sy]);
+    		}
+    	}
+
+    	// 判断移动位置是否合法
+    	check() {
+    		// 是否出界
+    		if (this.sx < 0 || this.sy < 0 || this.sx >= this.x || this.sy >= this.y) {
+        	alert('Game Over!!!');
+        	// 结束蛇移动的定时器
+        	clearInterval(this.moveTimer);
+        	return false;
+    		}
+
+    		// 是否发生自身碰撞
+    		for ( let i = 0; i < this.snake.length; i++) {
+        	if (this.snake[i] == this.map[this.sx][this.sy]) {
+        		// 蛇移动后与原蛇身内元素相同则发生碰撞
+        	  alert('Game over!!!');
+        	  clearInterval(this.moveTimer);
+        	  return false;
+        	};
+    		}
+
+    		return true;
+    	}
+
+    	// 随机生成新食物
+    	createFood() {
+    		// 随机出新的食物的下标的x和y值
+    		this.flagX = this.random(0, this.x - 1);
+    		this.flagY = this.random(0, this.y - 1);
+		
+		    // 食物与蛇身重合,重新生成
+		    if (this.map[this.flagX][this.flagY].className == 'col activeSnake') {
+		    	// 这里用类名来匹配snake数组，比数组的find库函数更适用
+		      this.createFood();// 重新随机新的egg
+		    } else {
+		      this.map[this.flagX][this.flagY].classList.add('food');
+    		}
+			}
+
+			// 定义一个生成min,max之间的随机数函数
+			random(min, max) {
+    		return Math.floor(Math.random() * (max - min + 1) + min);
+			};
+			// 添加开始事件
+			start() {
+    		clearInterval(this.moveTimer);
+    		this.moveTimer = setInterval(this.moveSnake.bind(this), this.speed);
+			}
+
+			// 添加暂停事件
+			pause() {
+    		clearInterval(this.moveTimer);
+			}
+
+			// 添加重新开始事件
+			restart() {
+    		window.location.reload();
+			}			
+
+		};
+		var tcs = new tanchishen('#main', 20, 20);
+	</script>
+</body>
+</html>
