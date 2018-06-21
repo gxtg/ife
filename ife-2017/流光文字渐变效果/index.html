@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>鼠标悬浮特效</title>
+    <style>
+        
+        body {
+            display: flex;
+            height: 100vh;
+            margin: 0;
+            justify-content: center;
+            align-items: center;
+        }/* 实现在浏览器窗口居中 */
+
+        .dad {
+            position: relative; 
+        }
+
+        .dad-content {
+            position: absolute; 
+            display: inline-block;
+            font-size: 16px;
+            line-height: 2;
+            top: 118px;
+            left: 200px; 
+            text-align: center;
+            opacity: 0;
+        }
+        a {
+            position: relative;
+            z-index: 99;
+         }/*解决a链接被覆盖的问题 */
+
+        a,
+        .dad-content {
+            color: transparent;
+            background-image: -webkit-linear-gradient(left, rgb(58, 194, 40), blue 12.5%, red 25%, blue 37.5%,
+            rgb(58, 194, 40) 50%, blue 67.5%, red 75%, blue 87.5%, rgb(58, 194, 40) 100%);
+            -webkit-background-clip: text;
+            background-size: 200% 100%;
+            animation: streamer 4s infinite linear;
+        }
+        @keyframes streamer {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: -100% 0;
+            }
+        }/*实现文字的流光效果 */
+
+        .dad-content::before {
+            content: "";
+            position: absolute;
+            width: 60px;
+            height: 135px;
+            border: 2px solid ghostwhite;
+            border-width: 3px 0;
+            -webkit-transition: all 1.5s;
+            -moz-transition: all 1.5s; 
+            transition: all 1.5s; 
+            top: -40px;
+            left: 34px;
+         }/*实现上下边框 */
+        .dad-content::after {
+            content: "";
+            position: absolute;
+            width: 240px;
+            height: 40px;
+            border: 2px solid ghostwhite;
+            border-width: 0 1.5px;
+            -webkit-transition: all 1.5s;
+            -moz-transition: all 1.5s; 
+            transition: all 1.5s; 
+            top: 10px;
+            left: -60px;
+        }/*实现左右边框 */
+
+        .dad:hover img {
+            filter: blur(5px);
+        }
+        .dad:hover .dad-content {
+             opacity: 1; 
+        }
+        .dad:hover .dad-content::before {
+            width: 242px;
+            left: -60px;
+        }
+        .dad:hover .dad-content::after {
+            height: 140px;
+            top: -40px;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="dad">
+        <img src="./image/timg.jpg" alt="" style="height: 300px;">
+        <span class="dad-content">流光渐变文字特效<br><a href="">点击进入</a></span>
+    </div>     
+</body>
+</html>
